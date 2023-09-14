@@ -36,7 +36,11 @@ const userCtrl = {
                 path: 'api/refresh_token'
             })
             
-            res.json({ accessToken})
+            res.json({
+                success: true,
+                message: 'User created successfully', 
+                accessToken
+            })
             
         } catch (error) {
            return res.status(500).json({ message: error.message })
@@ -61,7 +65,12 @@ const userCtrl = {
                path: 'api/refresh_token'
            })
            
-           res.json({ accessToken})
+           res.json({
+			success: true,
+			message: 'User logged in successfully',
+			accessToken,
+            user: user
+		})
 
 
         } catch (error) {
@@ -93,17 +102,19 @@ const userCtrl = {
             return res.status(500).json({msg: err.message})
         }
     },
-    auth: (req, res) => {
-        const token = req.header('Authorization');
+    auth: async (req, res) => {
+        const token = req.body.token;
 
         if (!token) {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
-        try {
+        try {   
+            console.log(token);
             // Verify the token using the secret key
             const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-            res.json({ message: 'This is a protected route', userId: decoded.id });
+            const user = await Users.findOne({_id: decoded.id});
+            res.json({ message: 'This is a protected route', user: user });
         } catch (err) {
             return res.status(403).json({ message: 'Forbidden' });
   }
