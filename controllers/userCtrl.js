@@ -93,6 +93,21 @@ const userCtrl = {
             return res.status(500).json({msg: err.message})
         }
     },
+    auth: (req, res) => {
+        const token = req.header('Authorization');
+
+        if (!token) {
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        try {
+            // Verify the token using the secret key
+            const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+            res.json({ message: 'This is a protected route', userId: decoded.id });
+        } catch (err) {
+            return res.status(403).json({ message: 'Forbidden' });
+  }
+    },
     getUser: async (req, res) => {
         try {
             const user = await Users.findById(req.user.id).select('-password')
