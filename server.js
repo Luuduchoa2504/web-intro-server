@@ -17,9 +17,11 @@ app.use(fileUpload({
 }))
 
 const userRouter = require('./routes/userRouter')
+const emailRouter = require('./routes/emailRouter')
 
 //Routes
 app.use('/api', userRouter)
+app.use('/api', emailRouter)
 
 
 // Connect to MongoDB
