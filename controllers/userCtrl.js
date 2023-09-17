@@ -129,6 +129,44 @@ const userCtrl = {
             return res.status(500).json({ msg: error.message})
         }
     },
+    getAllUsers: async (req, res) => {
+        try {
+            const users = await Users.find({ role: { $ne: 1 } }).select('-password');
+            // Check if any users were found
+            if (!users) {
+                return res.status(404).json({ msg: 'No users found' });
+            }
+            // Return the list of users
+            res.json(users);
+
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
+    },
+    getAdmins: async (req, res) => {
+        try {
+            const adminUsers = await Users.find({ role: 1 }).select('-password');
+            if (!adminUsers || adminUsers.length === 0) {
+                return res.status(404).json({ msg: 'No admin users found' });
+            }
+            res.json(adminUsers);
+
+        } catch (err) {
+            return res.status(500).json({ msg: err.message })
+        }
+    },
+    deleteAccount: async (req, res) => {
+      try {
+          const { userId } = req.params;
+          const deletedUser = await Users.findByIdAndRemove(userId);
+          if (!deletedUser) {
+              return res.status(404).json({ msg: 'User not found or already deleted' });
+          }
+          res.json({ msg: 'User deleted successfully' });
+      }  catch (err) {
+          return res.status(500).json({ msg: err.message });
+      }
+    },
     addCart: async (req, res) => {
         try {
             const user = await Users.findById(req.user.id)

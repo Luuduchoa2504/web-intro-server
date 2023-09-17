@@ -13,6 +13,9 @@ router.get('/logout', userCtrl.logout)
 router.get('/refresh_token', userCtrl.refreshToken)
 
 router.get('/info', auth, userCtrl.getUser)
+router.get('/getAllUsers', userCtrl.getAllUsers)
+router.delete('/delete/:id', userCtrl.deleteAccount)
+router.get('/getAllAdmins', userCtrl.getAdmins)
 router.patch('/addcart', auth, userCtrl.addCart)
 
 module.exports = router
