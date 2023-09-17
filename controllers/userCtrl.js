@@ -69,7 +69,7 @@ const userCtrl = {
 			success: true,
 			message: 'User logged in successfully',
 			accessToken,
-            // user: user
+            user: user
 		})
 
 
