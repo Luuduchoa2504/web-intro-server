@@ -167,6 +167,49 @@ const userCtrl = {
           return res.status(500).json({ msg: err.message });
       }
     },
+    createAccount: async (req, res) => {
+        try {
+            const { name, email, password, phone, role } = req.body
+            console.log(req.body)
+
+            const user = await Users.findOne({ email })
+            if (user) return res
+            .status(400)
+            .json({ msg: "Email already exists"})
+
+            if (password.length < 6)
+            return res
+            .status(400)
+            .json({ msg: "Password is at least 6 characters long"})  
+
+            //Password Encryption
+            const passwordHash = await bcrypt.hash(password, 10)
+            const newUser = new Users({
+                name, email, password: passwordHash, phone, role,
+            })
+
+            //Save mongoDB
+            await newUser.save()
+
+            //Create jsonwebtoken to authenticate
+            const accessToken = createAccessToken({id: newUser._id})
+            const refreshToken = createRefreshToken({id: newUser._id})
+            
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true,
+                path: 'api/refresh_token'
+            })
+            
+            res.json({
+                success: true,
+                message: 'User created successfully', 
+                accessToken
+            })
+            
+        } catch (error) {
+           return res.status(500).json({ message: error.message })
+       }
+    },
     addCart: async (req, res) => {
         try {
             const user = await Users.findById(req.user.id)
