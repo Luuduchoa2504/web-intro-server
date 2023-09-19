@@ -1,8 +1,8 @@
 const router = require('express').Router()
-const emailCtrl = require('../controllers/emailController')
+const ticketCtrk = require('../controllers/ticketController')
 
-router.get('/email', emailCtrl.getEmails)
-router.post('/email', emailCtrl.createMail)
-router.delete('/email/:id', emailCtrl.deleteMail)
+router.get('/ticket', ticketCtrk.getTickets)
+router.post('/ticket', ticketCtrk.createTicket)
+router.delete('/ticket/:id', ticketCtrk.deleteTicket)
 
 module.exports = router
