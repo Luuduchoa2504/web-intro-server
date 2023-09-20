@@ -1,8 +1,9 @@
 const router = require('express').Router()
-const ticketCtrk = require('../controllers/ticketController')
+const ticketCtrl = require('../controllers/ticketController')
 
-router.get('/ticket', ticketCtrk.getTickets)
-router.post('/ticket', ticketCtrk.createTicket)
-router.delete('/ticket/:id', ticketCtrk.deleteTicket)
+router.get('/ticket', ticketCtrl.getTickets)
+router.post('/ticket', ticketCtrl.createTicket)
+router.put('/ticket/:id', ticketCtrl.updateTicket);
+router.delete('/ticket/:id', ticketCtrl.deleteTicket)
 
 module.exports = router

@@ -120,13 +120,27 @@ const userCtrl = {
   }
     },
     getUser: async (req, res) => {
+        // try {
+        //     const user = await Users.findById(req.user.id).select('-password')
+        //     if(!user) return res.status(400).json({ msg: "User does not exist"})
+        //
+        //     res.json(user)
+        // } catch (error) {
+        //     return res.status(500).json({ msg: error.message})
+        // }
         try {
-            const user = await Users.findById(req.user.id).select('-password')
-            if(!user) return res.status(400).json({ msg: "User does not exist"})
+            const user = await Users.findById(req.user.id).select('-password');
+            if (!user) {
+                return res.status(400).json({ msg: "User does not exist" });
+            }
 
-            res.json(user)
+            if (user.role === 0) {
+                return res.status(403).json({ msg: "Invalid user" });
+            }
+
+            res.json(user);
         } catch (error) {
-            return res.status(500).json({ msg: error.message})
+            return res.status(500).json({ msg: error.message });
         }
     },
     getAllUsers: async (req, res) => {
@@ -143,6 +157,51 @@ const userCtrl = {
             return res.status(500).json({ msg: err.message })
         }
     },
+    updateUser: async (req, res) => {
+        try {
+            const { id } = req.params; // Get the user ID from the URL params
+            const { name, email, password, phone, role } = req.body; // Get updated user data from the request body
+
+            // Check if the user exists by their ID
+            const user = await Users.findById(id);
+
+            // If the user doesn't exist, return an error response
+            if (!user) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            // Update the user data based on the request
+            if (name) user.name = name;
+            if (email) user.email = email;
+
+            // Check if a new password is provided and hash it
+            if (password) {
+                if (password.length < 6) {
+                    return res.status(400).json({ msg: 'Password is at least 6 characters long' });
+                }
+                const passwordHash = await bcrypt.hash(password, 10);
+                user.password = passwordHash;
+            }
+
+            if (phone) user.phone = phone;
+            if (role) user.role = role;
+
+            // Save the updated user data in the database
+            await user.save();
+
+            // Create a new access token (if needed)
+            const accessToken = createAccessToken({ id: user._id });
+
+            // Respond with a success message
+            res.json({
+                success: true,
+                message: 'User updated successfully',
+                accessToken, // Include the access token if needed
+            });
+        } catch (error) {
+            return res.status(500).json({ message: error.message });
+        }
+    },
     getAdmins: async (req, res) => {
         try {
             const adminUsers = await Users.find({ role: { $ne: 0 } }).select('-password');
@@ -157,10 +216,23 @@ const userCtrl = {
     },
     deleteAccount: async (req, res) => {
         try {
-            await Emails.findByIdAndDelete(req.params.id)
-            res.json({ message: "Delete user successful" })
-        } catch (err) {
-            return res.status(500).json({ message: error.message })
+            const { id } = req.params; // Get the user ID from the URL params
+
+            // Check if the user exists by their ID
+            const user = await Users.findById(id);
+
+            // If the user doesn't exist, return an error response
+            if (!user) {
+                return res.status(404).json({ msg: 'User not found' });
+            }
+
+            // Delete the user from the database
+            await Users.findByIdAndRemove(id);
+
+            // Respond with a success message
+            res.json({ success: true, message: 'User deleted successfully' });
+        } catch (error) {
+            return res.status(500).json({ message: error.message });
         }
     },
     createAccount: async (req, res) => {

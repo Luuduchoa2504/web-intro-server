@@ -24,6 +24,15 @@ const ticketCtrl = {
             res.status(500).json({ success: false, error: err.message })
         }
     },
+    updateTicket: async  (req, res) => {
+        try {
+            const { email, name, phone, content } = req.body;
+            await Tickets.findByIdAndUpdate({ _id: req.params.id }, { email, name, phone, content });
+            res.json({ msg: "Update a ticket successfully" });
+        } catch (error) {
+            return res.status(500).json({ msg: error.message });
+        }
+    },
     deleteTicket: async (req, res) => {
         try {
             await Tickets.findByIdAndDelete(req.params.id)
