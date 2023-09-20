@@ -24,6 +24,16 @@ const emailCtrl = {
             res.status(500).json({ success: false, error: err.message })
         }
     },
+    updateMail: async (req, res) => {
+        try {
+            const { email } = req.body;
+            await Emails.findByIdAndUpdate({ _id: req.params.id }, { email });
+            res.json({ msg: "Update an email" });
+        } catch (error) {
+            return res.status(500).json({ msg: error.message });
+        }
+    },
+
     deleteMail: async (req, res) => {
         try {
             await Emails.findByIdAndDelete(req.params.id)

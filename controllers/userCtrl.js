@@ -131,7 +131,7 @@ const userCtrl = {
     },
     getAllUsers: async (req, res) => {
         try {
-            const users = await Users.find({ role: { $ne: 1 } }).select('-password');
+            const users = await Users.find({ role: 0 }).select('-password');
             // Check if any users were found
             if (!users) {
                 return res.status(404).json({ msg: 'No users found' });
@@ -145,7 +145,7 @@ const userCtrl = {
     },
     getAdmins: async (req, res) => {
         try {
-            const adminUsers = await Users.find({ role: 1 }).select('-password');
+            const adminUsers = await Users.find({ role: { $ne: 0 } }).select('-password');
             if (!adminUsers || adminUsers.length === 0) {
                 return res.status(404).json({ msg: 'No admin users found' });
             }
