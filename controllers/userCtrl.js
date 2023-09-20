@@ -156,16 +156,12 @@ const userCtrl = {
         }
     },
     deleteAccount: async (req, res) => {
-      try {
-          const { userId } = req.params;
-          const deletedUser = await Users.findByIdAndRemove(userId);
-          if (!deletedUser) {
-              return res.status(404).json({ msg: 'User not found or already deleted' });
-          }
-          res.json({ msg: 'User deleted successfully' });
-      }  catch (err) {
-          return res.status(500).json({ msg: err.message });
-      }
+        try {
+            await Emails.findByIdAndDelete(req.params.id)
+            res.json({ message: "Delete user successful" })
+        } catch (err) {
+            return res.status(500).json({ message: error.message })
+        }
     },
     createAccount: async (req, res) => {
         try {
